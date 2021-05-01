@@ -8,6 +8,7 @@ from keras.layers.embeddings import Embedding
 from sklearn.model_selection import train_test_split
 from sklearn import svm
 from sklearn.metrics import accuracy_score
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import pandas as pd
 import re
 import nltk
@@ -79,7 +80,7 @@ padded_sentences = pad_sequences(embedded_sentences, length_long_sentence, paddi
 x_train, x_test, y_train, y_test = train_test_split(padded_sentences, labels, test_size=0.3)
 
 #create a model
-model = svm.SVC(kernel='poly', degree=10)
+model = LinearDiscriminantAnalysis()
 
 #fit training data to the model
 model.fit(x_train, y_train)
