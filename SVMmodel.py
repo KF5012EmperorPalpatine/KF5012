@@ -6,6 +6,8 @@ from keras.models import Sequential
 from keras.layers import Dense, Flatten, Dropout, LSTM
 from keras.layers.embeddings import Embedding
 from sklearn.model_selection import train_test_split
+from sklearn import svm
+from sklearn.metrics import accuracy_score
 import pandas as pd
 import re
 import nltk
@@ -21,6 +23,7 @@ dataframe.head()
 dataframe['Headlines'] = dataframe[dataframe.columns[2:]].apply(lambda x: '. '.join(x.dropna().astype(str)),axis=1)
 corpus = dataframe['Headlines']
 labels = dataframe['Label']
+
 #remove punctuation and make lowercase
 corpus.replace("[^a-zA-Z]", " ", regex=True, inplace=True) 
 corpus = corpus.str.lower()
@@ -77,20 +80,14 @@ padded_sentences = pad_sequences(embedded_sentences, length_long_sentence, paddi
 x_train, x_test, y_train, y_test = train_test_split(padded_sentences, labels, test_size=0.3)
 
 #create a model
-model = Sequential()
-model.add(Embedding(vocab_length, 20, input_length=length_long_sentence))
-model.add(Flatten())
-model.add(Dense(1, activation='sigmoid'))
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-print(model.summary())
+model = svm.SVC()
 
 #fit training data to the model
-model.fit(x_train, y_train, epochs=50, verbose =1)
+model.fit(x_train, y_train)
 
-#calculate loss and accuracy
-loss, accuracy = model.evaluate(x_test, y_test, verbose=0)
-print(accuracy*100)
+#create a confusion matrix for the prediction results from sklearn.metrics import confusion_matrixs
+y_pred = model.predict(x_test)
 
-#create a confusion matric for the prediction results from sklearn.metrics import confusion_matrixs
-y_pred = model.predict_classes(x_test)
-confusion_matrix(y_test, y_pred)
+#calculate accuracy
+accuracy = accuracy_score(y_test, y_pred)
+print(accuracy * 100)
