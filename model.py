@@ -6,6 +6,8 @@ from keras.models import Sequential
 from keras.layers import Dense, Flatten, Dropout, LSTM
 from keras.layers.embeddings import Embedding
 from sklearn.model_selection import train_test_split
+from sklearn import svm
+from sklearn.metrics import accuracy_score
 import pandas as pd
 import re
 import nltk
@@ -77,21 +79,14 @@ padded_sentences = pad_sequences(embedded_sentences, length_long_sentence, paddi
 x_train, x_test, y_train, y_test = train_test_split(padded_sentences, labels, test_size=0.3)
 
 #create a model
-model = Sequential()
-model.add(Embedding(vocab_length, 20, input_length=length_long_sentence))
-model.add(Flatten())
-model.add(Dense(1, activation='sigmoid'))
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-print(model.summary())
+model = svm.SVC(kernel='poly', degree=10)
 
 #fit training data to the model
-model.fit(x_train, y_train, epochs=50, verbose =1)
+model.fit(x_train, y_train)
 
-#calculate loss and accuracy
-loss, accuracy = model.evaluate(x_test, y_test, verbose=0)
-print(accuracy*100)
+#predict test y values using
+y_pred = model.predict(x_test)
 
-#create a confusion matric for the prediction results
-from sklearn.metrics import confusion_matrix
-y_pred = model.predict_classes(x_test)
-confusion_matrix(y_test, y_pred)
+#calculate the accuracy of the model
+accuracy = accuracy_score(y_test, y_pred) * 100
+print(accuracy)
