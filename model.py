@@ -9,6 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn import svm
 from sklearn.metrics import accuracy_score
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn import tree
 import pandas as pd
 import re
 import nltk
@@ -38,17 +39,17 @@ for line in corpus:
 
 #move the results to a dataframe and see the correlation
 score = pd.DataFrame(results)['compound']
-score.corr(labels)
+#print(score.corr(labels))
+
 
 #convert the datatypes so it can be worked with them later
-corpus =  corpus.tolist()
+corpus = corpus.tolist()
 labels = labels.to_numpy()
 
-#set the stop words (including the leading 'b' which appears in some sentences)
+#set the stop words
 stop_words = set(nltk.corpus.stopwords.words('english'))
-stop_words.add("b")
 
-#remove stop words 
+#remove stop words
 corpus_without_sw = []
 for sent in corpus:
   sent_tokens = word_tokenize(sent)
@@ -57,7 +58,7 @@ for sent in corpus:
   #print(filtered_sent)
   corpus_without_sw.append(filtered_sent)
 
-#tokenize the corpus 
+#tokenize the corpus
 word_tokenizer = Tokenizer()
 word_tokenizer.fit_on_texts(corpus_without_sw)
 
@@ -67,6 +68,7 @@ vocab_length = len(word_tokenizer.word_index) +1
 #convert all the sentences (lines) in corpus to numeric arrays 
 embedded_sentences = word_tokenizer.texts_to_sequences(corpus_without_sw)
 #print(embedded_sentences)
+
 
 #get size of the largest line (in number of words) and pad the other lines with zeros at the end until they reach that size
 word_count = lambda sentence: len(word_tokenize(sentence))
@@ -80,7 +82,7 @@ padded_sentences = pad_sequences(embedded_sentences, length_long_sentence, paddi
 x_train, x_test, y_train, y_test = train_test_split(padded_sentences, labels, test_size=0.3)
 
 #create a model
-model = LinearDiscriminantAnalysis()
+model = tree.DecisionTreeClassifier()
 
 #fit training data to the model
 model.fit(x_train, y_train)
