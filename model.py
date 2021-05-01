@@ -59,7 +59,7 @@ word_tokenizer = Tokenizer()
 word_tokenizer.fit_on_texts(corpus_without_sw)
 
 #get the vocabulary length which is used in the first layer of the model
-vocab_length = len(word_tokenizer.word_index) + 1
+vocab_length = len(word_tokenizer.word_index) +1
 
 #convert all the sentences (lines) in corpus to numeric arrays 
 embedded_sentences = word_tokenizer.texts_to_sequences(corpus_without_sw)
@@ -91,6 +91,7 @@ model.fit(x_train, y_train, epochs=50, verbose =1)
 loss, accuracy = model.evaluate(x_test, y_test, verbose=0)
 print(accuracy*100)
 
-#create a confusion matric for the prediction results from sklearn.metrics import confusion_matrixs
+#create a confusion matric for the prediction results
+from sklearn.metrics import confusion_matrix
 y_pred = model.predict_classes(x_test)
 confusion_matrix(y_test, y_pred)
