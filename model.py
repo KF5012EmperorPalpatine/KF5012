@@ -1,95 +1,125 @@
-#import and download required libraries
-from numpy import array
-from keras.preprocessing.text import one_hot, Tokenizer
-from keras.preprocessing.sequence import pad_sequences
-from keras.models import Sequential
-from keras.layers import Dense, Flatten, Dropout, LSTM
-from keras.layers.embeddings import Embedding
+# import and download required libraries
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import confusion_matrix, accuracy_score
 from sklearn import svm
-from sklearn.metrics import accuracy_score
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn import tree
 import pandas as pd
-import re
-import nltk
-from nltk.tokenize import word_tokenize
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
-nltk.download('all')
 
-#read the data
+
+# read the data
 dataframe = pd.read_csv('DJIA.csv')
-dataframe.head()
 
-#split data into features (headlines/corpus) and labels (stock movement classified as up and down)
-dataframe['Headlines'] = dataframe[dataframe.columns[2:]].apply(lambda x: '. '.join(x.dropna().astype(str)),axis=1)
+# split data into features (headlines/corpus) and labels (stock movement classified as up and down)
+dataframe['Headlines'] = dataframe[dataframe.columns[2:]].apply(lambda x: '. '.join(x.dropna().astype(str)), axis=1)
 corpus = dataframe['Headlines']
 labels = dataframe['Label']
-#remove punctuation and make lowercase
-corpus.replace("[^a-zA-Z]", " ", regex=True, inplace=True) 
+# remove punctuation and make lowercase
+corpus.replace("[^a-zA-Z]", " ", regex=True, inplace=True)
 corpus = corpus.str.lower()
 
-#calculate the sentiment value for each line (all news of a day)
+# calculate the sentiment value for each line (all news of a day)
 sia = SentimentIntensityAnalyzer()
-results = [] #will contain the compound score
+results = []  # will contain the compound score
 for line in corpus:
-  pol_score = sia.polarity_scores(line)
-  results.append(pol_score)
-#results
+    pol_score = sia.polarity_scores(line)
+    results.append(pol_score)
+# results
 
-#move the results to a dataframe and see the correlation
+# move the results to 'score' and see the correlation
 score = pd.DataFrame(results)['compound']
-#print(score.corr(labels))
+print('Correlation between the price movement and sentiment of the day')
+print(score.corr(labels))
+print('\n')
+
+print('For each method the results are shown as confusion matrix and accuracy')
+# text representation: bag of words approach with count vectorizer (bigrams)
+print('Word representation method: Bag of Words using Count Vectorizer')
+countVect = CountVectorizer(ngram_range=(2,2))
+dataset = countVect.fit_transform(corpus)
+
+# split the data into training and testing
+x_train, x_test, y_train, y_test = train_test_split(dataset, labels, test_size=0.3, shuffle=False)
+
+#create naive bayes model
+print('Classification method: Naive Bayes')
+naive = MultinomialNB()
+naive.fit(x_train, y_train)
+#predict classes and print results
+y_pred = naive.predict(x_test)
+confmat = confusion_matrix(y_test, y_pred)
+print(confmat)
+acc = accuracy_score(y_test, y_pred)
+print(acc)
+print('\n')
+
+#create random forest classifier
+print('Classification method: Random Forest')
+rf = RandomForestClassifier(n_estimators=200, criterion='entropy')
+rf.fit(x_train,y_train)
+#predict classes and print results
+y_pred = rf.predict(x_test)
+confmat = confusion_matrix(y_test, y_pred)
+print(confmat)
+acc = accuracy_score(y_test, y_pred)
+print(acc)
+print('\n')
+
+#create SVM classifier
+print('Classification method: SVM')
+SVM = svm.SVC(kernel='linear', C=10)
+SVM.fit(x_train, y_train)
+#predict classes and print results
+y_pred = SVM.predict(x_test)
+confmat = confusion_matrix(y_test, y_pred)
+print(confmat)
+acc = accuracy_score(y_test, y_pred)
+print(acc)
+print('\n')
 
 
-#convert the datatypes so it can be worked with them later
-corpus = corpus.tolist()
-labels = labels.to_numpy()
+#text representation: bag of words using tfidf (bigrams)
+print('Word representation method: Bag of Words using TFIDF Vectorizer')
+tfidf = TfidfVectorizer(ngram_range=(2,2))
+dataset = tfidf.fit_transform(corpus)
 
-#set the stop words
-stop_words = set(nltk.corpus.stopwords.words('english'))
+# split the data into training and testing
+x_train, x_test, y_train, y_test = train_test_split(dataset, labels, test_size=0.3, shuffle=False)
 
-#remove stop words
-corpus_without_sw = []
-for sent in corpus:
-  sent_tokens = word_tokenize(sent)
-  tokens_without_sw = [w for w in sent_tokens if not w in stop_words]
-  filtered_sent = (" ").join(tokens_without_sw)
-  #print(filtered_sent)
-  corpus_without_sw.append(filtered_sent)
+#create naive bayes model
+print('Classification method: Naive Bayes')
+naive = MultinomialNB()
+naive.fit(x_train, y_train)
+#predict classes and print results
+y_pred = naive.predict(x_test)
+confmat = confusion_matrix(y_test, y_pred)
+print(confmat)
+acc = accuracy_score(y_test, y_pred)
+print(acc)
+print('\n')
 
-#tokenize the corpus
-word_tokenizer = Tokenizer()
-word_tokenizer.fit_on_texts(corpus_without_sw)
+#create random forest classifier
+print('Classification method: Random Forest')
+rf = RandomForestClassifier(n_estimators=200, criterion='entropy')
+rf.fit(x_train,y_train)
+#predict classes and print results
+y_pred = rf.predict(x_test)
+confmat = confusion_matrix(y_test, y_pred)
+print(confmat)
+acc = accuracy_score(y_test, y_pred)
+print(acc)
+print('\n')
 
-#get the vocabulary length which is used in the first layer of the model
-vocab_length = len(word_tokenizer.word_index) +1
-
-#convert all the sentences (lines) in corpus to numeric arrays 
-embedded_sentences = word_tokenizer.texts_to_sequences(corpus_without_sw)
-#print(embedded_sentences)
-
-
-#get size of the largest line (in number of words) and pad the other lines with zeros at the end until they reach that size
-word_count = lambda sentence: len(word_tokenize(sentence))
-longest_sentence = max(corpus_without_sw, key=word_count)
-length_long_sentence = len(word_tokenize(longest_sentence))
-
-padded_sentences = pad_sequences(embedded_sentences, length_long_sentence, padding='post')
-#print(padded_sentences)
-
-#split the data into training and testing
-x_train, x_test, y_train, y_test = train_test_split(padded_sentences, labels, test_size=0.3)
-
-#create a model
-model = tree.DecisionTreeClassifier()
-
-#fit training data to the model
-model.fit(x_train, y_train)
-
-#predict test y values using
-y_pred = model.predict(x_test)
-
-#calculate the accuracy of the model
-accuracy = accuracy_score(y_test, y_pred) * 100
-print(accuracy)
+#create SVM classifier
+print('Classification method: SVM')
+SVM = svm.SVC(kernel='linear', C=10)
+SVM.fit(x_train, y_train)
+#predict classes and print results
+y_pred = SVM.predict(x_test)
+confmat = confusion_matrix(y_test, y_pred)
+print(confmat)
+acc = accuracy_score(y_test, y_pred)
+print(acc)
+print('\n')
