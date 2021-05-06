@@ -7,6 +7,7 @@ from sklearn.metrics import confusion_matrix, accuracy_score
 from sklearn import svm
 import pandas as pd
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import pickle
 
 
 # read the data
@@ -74,11 +75,14 @@ SVM.fit(x_train, y_train)
 #predict classes and print results
 y_pred = SVM.predict(x_test)
 confmat = confusion_matrix(y_test, y_pred)
+print("here")
 print(confmat)
 acc = accuracy_score(y_test, y_pred)
 print(acc)
 print('\n')
 
+filename = 'finalised_model.sav'
+pickle.dump(SVM,open(filename,'wb'))
 
 #text representation: bag of words using tfidf (bigrams)
 print('Word representation method: Bag of Words using TFIDF Vectorizer')
