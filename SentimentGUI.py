@@ -24,7 +24,7 @@ class SentimentGUI(ttk.Frame):
         self.boxFrame.pack()
 
         #Headline text box + scroll bar
-        self.headlineTxt = tk.Listbox(self.boxFrame, width = 60, height = 3)
+        self.headlineTxt = tk.Listbox(self.boxFrame, width = 60, height = 6)
         self.headlineTxt.pack(side = "left",fill="both")
 
         yscrollbar = tk.Scrollbar(self.boxFrame)
@@ -36,13 +36,13 @@ class SentimentGUI(ttk.Frame):
         self.headlineTxt.config(xscrollcommand = xscrollbar.set)
         yscrollbar.config(command = self.headlineTxt.yview)
         xscrollbar.config(command = self.headlineTxt.xview)
-
         #inserting data
-        file = open("headlineData.txt","r")
+        file = open("headlineData.csv","r")
         headlines = file.readlines()
+        headlines = headlines[1].split(",")
         file.close()
-        for line in headlines:
-            self.headlineTxt.insert(tk.END, line)
+        for headline in headlines[2:]:
+            self.headlineTxt.insert(tk.END, headline)
 
         self.headlineTxt.config(state="disabled")
 
@@ -76,10 +76,6 @@ class SentimentGUI(ttk.Frame):
             self.addButton = ttk.Button(self.footerFrame,text="Add to Watchlist",command = self.Add)
             self.addButton.pack()
 
-
-
-    def getSentiment(self):
-        pass
 
     def Back(self):
         self.destroy()

@@ -1,16 +1,23 @@
 import tkinter as tk
 from tkinter import ttk
 from SentimentGUI import SentimentGUI
-import scrapy
-from scrapy.crawler import CrawlerProcess
-from scraper import HeadlineSpider
 import os
+import pickle
+import pandas as pd
+import time
+from dataProcess import dataProcess
+from predict import predict
 
 class TickerGUI(ttk.Frame):
     def __init__(self,container):
         super().__init__(container)
         self.container = container
         self.pack()
+
+        ## Build widgets on object creation -----
+
+
+        #frame for user input widgets (header, entry, button)
         self.entryFrame = ttk.Frame(self)
         self.entryFrame.pack()
 
@@ -20,13 +27,15 @@ class TickerGUI(ttk.Frame):
 
         # ticker entry box
         self.tickerEntry = ttk.Entry(self.entryFrame)
-        self.tickerEntry.pack()
+        self.tickerEntry.pack(side="left")
 
         # submit button
         self.entrySubmitButton = ttk.Button(self.entryFrame,text="Submit",
                                             command = lambda : self.submit(self.tickerEntry.get()))
-        self.entrySubmitButton.pack()
+        self.entrySubmitButton.pack(side="right")
 
+
+        # Frame for watchlist widgets (header + listbox)
         self.watchlistFrame = ttk.Frame(self)
         self.watchlistFrame.pack()
 
@@ -63,7 +72,8 @@ class TickerGUI(ttk.Frame):
     def submit(self,ticker):
         # Do Scraping ///
         os.system('cmd /c scrapy runspider scraper.py -a ticker='+ticker)
-        #load display page ///
+        corpus = dataProcess("headlineData.csv")
+        prediction = predict(corpus)
         self.destroy()
         SentimentGUI(self.container,ticker)
 

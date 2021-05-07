@@ -14,10 +14,17 @@ class HeadlineSpider(scrapy.Spider):
 
     def parse(self, response):
         SET_SELECTOR = '.news-link-left'
-        file = open("headlineData.txt", "w+")
+        file = open("headlineData.csv", "w+")
+        headlines = []
         for brickset in response.css(SET_SELECTOR):
             NAME_SELECTOR = 'a ::text'
-            file.write(brickset.css(NAME_SELECTOR).extract_first() + "\n")
+            headlines.append(brickset.css(NAME_SELECTOR).extract_first())
+        file.write("empty1,empty2")
+        for headerNum in range(1,len(headlines)):
+            file.write(",headline"+str(headerNum))
+        file.write("\nspacer2,spacer2")
+        for headline in headlines:
+            file.write(","+headline)
         file.close()
 
 
