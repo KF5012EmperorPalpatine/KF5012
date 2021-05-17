@@ -7,7 +7,6 @@ class RootGUI(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Sentimental Stocks")
-        self.geometry("400x250")
         self.resizable(False,False)
 
         TickerGUI(self)

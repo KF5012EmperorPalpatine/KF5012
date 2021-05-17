@@ -1,15 +1,14 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 from SentimentGUI import SentimentGUI
 import os
-import pickle
-import pandas as pd
-import time
 from dataProcess import dataProcess
 from predict import predict
 
 class TickerGUI(ttk.Frame):
     def __init__(self,container):
+        container.geometry("400x250")
         super().__init__(container)
         self.container = container
         self.pack()
@@ -59,7 +58,8 @@ class TickerGUI(ttk.Frame):
         scrollbar.config(command = self.watchlistMenu.yview)
 
         for i in range(0,len(self.data)):
-            self.watchlistMenu.insert(i,self.data[i])
+            self.watchlistMenu.insert(i,self.data[i][0:-1])
+
 
     def clickEvent(self,event):
         selection = event.widget.curselection()
@@ -71,13 +71,28 @@ class TickerGUI(ttk.Frame):
 
     def submit(self,ticker):
         # Do Scraping ///
+        ticker = ticker.upper()
         os.system('cmd /c scrapy runspider scraper.py -a ticker='+ticker)
-        corpus = dataProcess("headlineData.csv")
-        prediction = predict(corpus)
-        self.destroy()
-        SentimentGUI(self.container,ticker)
+        if(self.validateTicker(ticker)):
+            corpus = dataProcess("headlineData.csv")
+            prediction = predict(corpus)
+            self.destroy()
+            SentimentGUI(self.container,ticker,prediction)
+        else:
+            messagebox.showerror("Ticker Error","The ticker you entered is invalid")
 
     def validateTicker(self,ticker):
-        pass
+        valid = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        for character in ticker:
+            if character not in valid:
+                return False
+        if len(ticker) > 5:
+            return False
+        if len(ticker) < 1:
+            return False
+        file = open("headlineData.csv","r")
+        if file.readline() == "INVALID":
+            return False
+        return True
     # Do Validation ///
 

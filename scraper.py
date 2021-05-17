@@ -10,7 +10,7 @@ class HeadlineSpider(scrapy.Spider):
         self.url = "https://finviz.com/quote.ashx?t="+ticker
 
     def start_requests(self):
-        yield scrapy.Request(url= self.url,callback=self.parse)
+        yield scrapy.Request(url= self.url,callback=self.parse, errback = self.errorParse)
 
     def parse(self, response):
         SET_SELECTOR = '.news-link-left'
@@ -27,4 +27,7 @@ class HeadlineSpider(scrapy.Spider):
             file.write(","+headline)
         file.close()
 
-
+    def errorParse(self):
+        file = open("headlineData.csv","w+")
+        file.write("INVALID")
+        file.close()
