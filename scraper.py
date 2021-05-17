@@ -27,7 +27,7 @@ class HeadlineSpider(scrapy.Spider):
             file.write(","+headline)
         file.close()
 
-    def errorParse(self):
+    def errorParse(self,err):
         file = open("headlineData.csv","w+")
         file.write("INVALID")
         file.close()
