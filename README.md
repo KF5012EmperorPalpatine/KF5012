@@ -1,7 +1,11 @@
 # KF5012
-All code for SEP project
+All code and documentation for SEP project
 
-[Solution Testing.pdf](https://github.com/KF5012EmperorPalpatine/KF5012/files/6516691/Solution.Testing.pdf)
+[Iterative Development.pdf](https://github.com/KF5012EmperorPalpatine/KF5012/files/6524768/Iterative.Development.pdf)
+
+[Project Management.pdf](https://github.com/KF5012EmperorPalpatine/KF5012/files/6524763/Project.Management.pdf)
+
+[Solution Testing.pdf](https://github.com/KF5012EmperorPalpatine/KF5012/files/6524762/Solution.Testing.pdf)
 
 [Solution Design.pdf](https://github.com/KF5012EmperorPalpatine/KF5012/files/6516884/Solution.Design.pdf)
 
