@@ -10,3 +10,5 @@ All code for SEP project
 [ProjectIdeation.pdf](https://github.com/KF5012EmperorPalpatine/KF5012/files/6517144/ProjectIdeation.pdf)
 
 [UI Development.pdf](https://github.com/KF5012EmperorPalpatine/KF5012/files/6517150/UI.Development.pdf)
+
+[Solution Review.docx](https://github.com/KF5012EmperorPalpatine/KF5012/files/6523840/Solution.Review.docx)
